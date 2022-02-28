@@ -5,6 +5,7 @@ target
 HELP.md
 .gradle
 .allure
+.data
 build/
 
 ### STS ###
