@@ -1,14 +1,27 @@
-version: '3.1'
+version: '3.3'
 
 services:
-  db:
+  mysql:
     image: mysql:latest
-    command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes:
-      - "./.data/db:/var/lib/mysql"
+      - "./.data/mysql:/var/lib/mysql"
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: orders
+      MYSQL_USER: app
+      MYSQL_PASSWORD: 12345678
     ports:
       - 3306:3306
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - "./.data/postgres:/var/lib/postgresql"
+    environment:
+      POSTGRES_DB: orders
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: 12345678
+    ports:
+      - 5432:5432
