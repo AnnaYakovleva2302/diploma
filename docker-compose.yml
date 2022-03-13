@@ -29,3 +29,5 @@ services:
     build:
       context: ./gate-simulator
       dockerfile: Dockerfile
+    ports:
+      - 9999:9999
