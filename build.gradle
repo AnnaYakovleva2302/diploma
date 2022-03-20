@@ -17,6 +17,8 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testImplementation 'com.github.javafaker:javafaker:1.0.1'
+    testImplementation 'mysql:mysql-connector-java:8.0.18'
+    testImplementation 'org.postgresql:postgresql:42.3.3'
     testImplementation 'com.codeborne:selenide:5.19.0'
     testImplementation 'io.qameta.allure:allure-selenide:2.13.3'
 }

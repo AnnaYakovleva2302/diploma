@@ -21,8 +21,8 @@ public class MainPageObject {
         root.$(byText("Купить в кредит")).click();
     }
 
-    public String getTourPrice() {
-        return root.$(withText("Всего")).text().replaceAll("\\D+","");
+    public int getTourPrice() {
+        return Integer.parseInt(root.$(withText("Всего")).text().replaceAll("\\D+", ""));
     }
 
     public SelenideElement getTitle() {

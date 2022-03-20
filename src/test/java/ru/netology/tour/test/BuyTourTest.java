@@ -3,6 +3,7 @@ package ru.netology.tour.test;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.open;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 
@@ -14,8 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.qameta.allure.selenide.AllureSelenide;
+import lombok.SneakyThrows;
 import ru.netology.tour.data.CardDataGenerator;
 import ru.netology.tour.data.CardInfo;
+import ru.netology.tour.data.DataBaseManager;
 import ru.netology.tour.pageObject.CardFormPageObject;
 import ru.netology.tour.pageObject.MainPageObject;
 import ru.netology.tour.pageObject.NotificationsPageObject;
@@ -24,6 +27,7 @@ public class BuyTourTest {
     MainPageObject page;
     CardFormPageObject form;
     NotificationsPageObject notifications;
+    DataBaseManager db;
     String successText;
     String errorText;
     String formPayByCardText;
@@ -33,7 +37,7 @@ public class BuyTourTest {
     String validationExpiredYearText;
     String validationExpiredMonthText;
     int processingTime;
-
+    
     @BeforeAll
     static void setUpAll() {
         SelenideLogger.addListener("allure", new AllureSelenide());
@@ -45,11 +49,13 @@ public class BuyTourTest {
     }
 
     @BeforeEach
+    @SneakyThrows
     void openBrowser() {
         open("http://localhost:8080");
         page = new MainPageObject();
         form = new CardFormPageObject();
         notifications = new NotificationsPageObject();
+        db = new DataBaseManager();
     }
 
     public BuyTourTest() {
@@ -91,7 +97,16 @@ public class BuyTourTest {
         page.getTitle().shouldHave(text(titleText));
     }
 
-    public void expextAcceptedResult(CardInfo card) {
+    public void expectMatchedTourPrice() {
+        // get real tour price from written in form
+        int tourPrice = page.getTourPrice();
+        // get latest payment amount from db
+        int savedTourPrice = db.getLastPaymentAmount();
+        // check if saved and announced prices are equal
+        assertEquals(tourPrice, savedTourPrice);
+    }
+
+    public void expectAcceptedResult(CardInfo card) {
         launchAndCheckFormBasedOnCard(card);
         // fill and submit the form with card data
         this.fillAndSubmitTheForm(form, card);
@@ -100,7 +115,7 @@ public class BuyTourTest {
         notifications.getError().shouldNotBe(visible);
     }
 
-    public void expextDeclinedResult(CardInfo card) {
+    public void expectDeclinedResult(CardInfo card) {
         launchAndCheckFormBasedOnCard(card);
         // fill and submit the form with card data
         this.fillAndSubmitTheForm(form, card);
@@ -112,45 +127,99 @@ public class BuyTourTest {
     @Test
     void shouldAcceptWithValidAcceptedDebitCard() {
         CardInfo card = CardDataGenerator.generateAcceptedCard(false);
+        // store orders count before test launched
+        int before = db.getOrdersCount();
         // launch tests and verify accepted form results
-        expextAcceptedResult(card);
-        // get real tour price
-        // String tourPrice = page.getTourPrice();
+        expectAcceptedResult(card);
+        // get orders count after test launched
+        int after = db.getOrdersCount();
+        // DB check if after count increased in 1
+        assertEquals(before + 1, after);
+        // DB check if payment id is reflected in orders list
+        assertEquals(db.getLastPaymentID(), db.getLastTransactionID());
+        // DB check if payment was accepted
+        assertEquals("APPROVED", db.getLastPaymentStatus());
+        // check if saved and announced prices are equal
+        expectMatchedTourPrice();
     }
 
     @Test
     void shouldDeclineWithValidDeclinedDebitCard() {
         CardInfo card = CardDataGenerator.generateDeclinedCard(false);
+        // store orders count before test launched
+        int before = db.getOrdersCount();
         // launch tests and verify declined form results
-        expextDeclinedResult(card);
+        expectDeclinedResult(card);
+        // get orders count after test launched
+        int after = db.getOrdersCount();
+        // DB check if after count increased in 1
+        assertEquals(before + 1, after);
+        // DB check if payment id is reflected in orders list
+        assertEquals(db.getLastPaymentID(), db.getLastTransactionID());
+        // DB check if payment was declined
+        assertEquals("DECLINED", db.getLastPaymentStatus());
+        // check if saved and announced prices are equal
+        expectMatchedTourPrice();
     }
 
     @Test
     void shouldDeclineWithValidRandomDebitCard() {
         CardInfo card = CardDataGenerator.generateRandomValidCard(false);
+        // store orders count before test launched
+        int before = db.getOrdersCount();
         // launch tests and verify declined form results
-        expextDeclinedResult(card);
+        expectDeclinedResult(card);
+        // get orders count after test launched
+        int after = db.getOrdersCount();
+        // DB check if after count is the same as before
+        assertEquals(before, after);
     }
 
     @Test
     void shouldAcceptWithValidAcceptedCreditCard() {
         CardInfo card = CardDataGenerator.generateAcceptedCard(true);
+        // store orders count before test launched
+        int before = db.getOrdersCount();
         // launch tests and verify accepted form results
-        expextAcceptedResult(card);
+        expectAcceptedResult(card);
+        // get orders count after test launched
+        int after = db.getOrdersCount();
+        // DB check if after count increased in 1
+        assertEquals(before + 1, after);
+        // DB check if credit id is reflected in orders list
+        assertEquals(db.getLastCreditID(), db.getLastTransactionID());
+        // DB check if payment was accepted
+        assertEquals("APPROVED", db.getLastCreditStatus());
     }
 
     @Test
     void shouldDeclineWithValidDeclinedCreditCard() {
         CardInfo card = CardDataGenerator.generateDeclinedCard(true);
+        // store orders count before test launched
+        int before = db.getOrdersCount();
         // launch tests and verify declined form results
-        expextDeclinedResult(card);
+        expectDeclinedResult(card);
+        // get orders count after test launched
+        int after = db.getOrdersCount();
+        // DB check if after count increased in 1
+        assertEquals(before + 1, after);
+        // DB check if credit id is reflected in orders list
+        assertEquals(db.getLastCreditID(), db.getLastTransactionID());
+        // DB check if credit was declined
+        assertEquals("DECLINED", db.getLastCreditStatus());
     }
 
     @Test
     void shouldDeclineWithValidRandomCreditCard() {
         CardInfo card = CardDataGenerator.generateRandomValidCard(true);
+        // store orders count before test launched
+        int before = db.getOrdersCount();
         // launch tests and verify declined form results
-        expextDeclinedResult(card);
+        expectDeclinedResult(card);
+        // get orders count after test launched
+        int after = db.getOrdersCount();
+        // DB check if after count is the same as before
+        assertEquals(before, after);
     }
 
     @Test
