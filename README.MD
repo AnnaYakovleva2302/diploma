@@ -16,11 +16,13 @@
 * открыть файл application.properties 
 * закомментировать или удалить строку `spring.datasource.url=jdbc:postgresql://localhost:5432/orders` 
 * добавить строку `spring.datasource.url=jdbc:mysql://localhost:3306/orders`
-* повторить пункты 3-5 из инструкции запуска тестов.
+* сохранить файл application.properties 
+* повторить пункты 3-5 из инструкции запуска тестов
 
 ## Для переключения приложения и тестов в режим работы с базой данных PostgreSQL необходимо:
 * закрыть текущие открытые терминалы (если были выполнены пункты выше) 
 * открыть файл application.properties 
 * закомментировать или удалить строку `spring.datasource.url=jdbc:mysql://localhost:3306/orders` 
 * добавить строку `spring.datasource.url=jdbc:postgresql://localhost:5432/orders`
-* повторить пункты 3-5 из инструкции запуска тестов.
+* сохранить файл application.properties 
+* повторить пункты 3-5 из инструкции запуска тестов
