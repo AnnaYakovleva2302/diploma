@@ -26,6 +26,7 @@ dependencies {
 test {
     useJUnitPlatform()
     ignoreFailures = true
+    systemProperty 'spring.datasource.url', System.getProperty('spring.datasource.url', 'jdbc:mysql://localhost:3306/orders')
 }
 
 allure {
