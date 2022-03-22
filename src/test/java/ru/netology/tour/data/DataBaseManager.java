@@ -19,7 +19,6 @@ public class DataBaseManager {
         InputStream input = new FileInputStream(configurationFile);
         properties.load(input);
         String url = System.getProperty("spring.datasource.url");
-        System.out.println("!!!!!" + url);
         connection = DriverManager.getConnection(
             url, 
             properties.getProperty("spring.datasource.username"), 
