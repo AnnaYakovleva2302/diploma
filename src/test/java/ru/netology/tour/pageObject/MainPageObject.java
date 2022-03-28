@@ -27,7 +27,7 @@ public class MainPageObject {
     }
 
     public int getTourPrice() {
-        return Integer.parseInt(root.$(withText("Всего")).text().replaceAll("\\D+", ""));
+        return Integer.parseInt(root.$(withText("Всего")).text().replaceAll("\\D+", "")) * 100;
     }
 
     public String getTitle() {
